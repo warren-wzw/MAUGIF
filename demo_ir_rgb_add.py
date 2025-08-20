@@ -24,8 +24,8 @@ def setup_seed(seed):
 setup_seed(2) 
 
 # 图像路径
-image_path_1 = r'.\data\ir1.png'
-image_path_2 = r'.\data\rgb1.png'
+image_path_1 = r'.\data\ir2.png'
+image_path_2 = r'.\data\rgb2.png'
 # 加载图像
 image1 = Image.open(image_path_1)
 image2 = Image.open(image_path_2)
@@ -118,10 +118,12 @@ class IR_RGB_encoder(nn.Module):
 
     def forward(self, ir, rgb):
 
-        gg   = self.encoder_ir(ir-rgb)
-        gg1  = self.encoder_ir(rgb)
-
-        return gg, gg1
+        # gg   = self.encoder_ir(ir-rgb)
+        # gg1  = self.encoder_ir(rgb)
+        # return gg, gg1
+        g1 = self.encoder_ir(ir)
+        gg1 = self.encoder_rgb(rgb)
+        return g1, gg1
     
 class IR_RGB_decoder(nn.Module):
     def __init__(self, ir_decoder, rgb_decoder):
@@ -131,14 +133,14 @@ class IR_RGB_decoder(nn.Module):
 
     def forward(self, gg1, ir, rgb):
 
-        rgb_detail = self.decoder_rgb(ir, rgb)
-        rgb1 = gg1+rgb_detail
-        ir1  = self.decoder_ir(gg1)
-        
-        fusion1 = ir+rgb_detail
-        fusion2 = self.decoder_ir(rgb)
-        
-        return  rgb1, ir1, fusion1, fusion2
+        # rgb_detail = self.decoder_rgb(ir, rgb)
+        # rgb1 = gg1+rgb_detail
+        # fusion1 = ir+rgb_detail
+        # return  rgb1,  fusion1
+        ir_detail = self.decoder_rgb(ir, rgb)
+        ir1 = gg1 + ir_detail
+        fusion1 = rgb+ir_detail
+        return  ir1,  fusion1
 
 encoder_spa  = IR_Encoder()
 encoder_spec = RGB_Encoder()
@@ -157,35 +159,47 @@ for iter in range(max_iter):
     gg, gg1 = model_en(ir, rgb)
     fusion = gg1
     #loss1 = 1*torch.norm(rgb1-rgb,2) +  torch.norm(ir1-ir,2)
-    loss2 = torch.norm(gg,2)
-    loss3 = 1*torch.norm(gg1-ir,2) + 1*torch.norm(gg1-rgb,2)
-    loss  = 0.75*loss2 + loss3
+    loss2 = torch.norm(gg-gg1,2)
+    loss3 = 1*torch.norm(gg1-ir,2) + 0.9*torch.norm(gg1-rgb,2)
+    loss  = 0.1*loss2 + loss3
 
     optimizer.zero_grad()
     loss.backward(retain_graph=True)
     optimizer.step()
     # if iter % 1000 == 0:
+    #         EN, MI, SF, AG, SD, CC, SCD, VIF, MSE, PSNR, Qabf, Nabf, SSIM, MS_SSIM = evaluation_one(ir, rgb, fusion)
+    #         print('EN:', round(EN, 4))
+    #         ('MI:', round(MI, 4))
+    #         print('SF:', round(SF, 4))
+    #         print('AG:', round(AG, 4))
+    #         print('SD:', round(SD, 4))
+    #         print('CC:', round(CC, 4))
+    #         print('SCD:', round(SCD, 4))
+    #         print('VIF:', round(VIF, 4))
+    #         print('MSE:', round(MSE, 4))
+    #         print('PSNR:', round(PSNR, 4))
+    #         print('Qabf:', round(Qabf, 4))
+    #         print('Nabf:', round(Nabf, 4))
+    #         print('SSIM:', round(SSIM, 4))
+    #         print('MS_SSIM:', round(MS_SSIM, 4))
+    #         print('============================')
+        
+    # if iter % 1000 == 0:
     #     HR_HSI = fusion
     #     HR_HSIt = HR_HSI.permute(1,2,0)
-    #     ps = peak_signal_noise_ratio(np.clip(HR_HSIt.cpu().detach().numpy(),0,1),gt.permute(1,2,0).cpu().detach().numpy())
-    #     print('iteration:',iter,'PSNR',ps)
-        
-    if iter % 1000 == 0:
-        HR_HSI = fusion
-        HR_HSIt = HR_HSI.permute(1,2,0)
-        plt.figure(figsize=(15,45))
-        plt.subplot(131)
-        plt.imshow(ir.permute(1,2,0).cpu().detach().numpy().squeeze())
-        plt.title('IR')
+    #     plt.figure(figsize=(15,45))
+    #     plt.subplot(131)
+    #     plt.imshow(ir.permute(1,2,0).cpu().detach().numpy().squeeze())
+    #     plt.title('IR')
            
-        plt.subplot(132)
-        plt.imshow(rgb.permute(1,2,0).cpu().detach().numpy())
-        plt.title('RGB')
+    #     plt.subplot(132)
+    #     plt.imshow(rgb.permute(1,2,0).cpu().detach().numpy())
+    #     plt.title('RGB')
         
-        plt.subplot(133)
-        plt.imshow(HR_HSIt.cpu().detach().numpy())
-        plt.title('fusion')
-        plt.show()
+    #     plt.subplot(133)
+    #     plt.imshow(HR_HSIt.cpu().detach().numpy())
+    #     plt.title('fusion')
+    #     plt.show()
     
 decoder_ir  = IR_Decoder()
 decoder_rgb = RGB_Decoder() 
@@ -195,9 +209,9 @@ params += [x for x in model_de.parameters()]
 optimizer1    = optim.Adam(params, lr=lr_real, weight_decay=1e-8) 
 for iter in range(5001):
     
-    rgb1, ir1, fusion1, fusion2 = model_de(gg1, ir, rgb)
+    rgb1,  fusion1 = model_de(gg1, ir, rgb)
     fusion = fusion1
-    loss1 = torch.norm(rgb1-rgb,2) 
+    loss1 = torch.norm(rgb1-ir,2) 
     
     loss  = loss1
 
@@ -227,7 +241,7 @@ for iter in range(5001):
         plt.title('fusion')
         plt.show()
         
-        EN, MI, SF, AG, SD, CC, SCD, VIF, MSE, PSNR, Qabf, Nabf, SSIM, MS_SSIM = evaluation_one(ir1, rgb, fusion)
+        EN, MI, SF, AG, SD, CC, SCD, VIF, MSE, PSNR, Qabf, Nabf, SSIM, MS_SSIM = evaluation_one(ir, rgb, fusion)
         print('EN:', round(EN, 4))
         print('MI:', round(MI, 4))
         print('SF:', round(SF, 4))
