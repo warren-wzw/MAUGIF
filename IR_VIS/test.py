@@ -28,7 +28,7 @@ def main():
             vis=DATA+'vi/'+file
             ir=DATA+'ir/'+file
             image1 = Image.open(vis)
-            image2 = Image.open(ir)
+            image2 = Image.open(ir).convert("L")
             vis  = convert_tensor(image1).to('cuda:0')
             ir = convert_tensor(image2).to('cuda:0').unsqueeze(0)
             Y_vis,Cb_vis,Cr_vis= RGB2YCrCb(vis.unsqueeze(0))
@@ -36,11 +36,13 @@ def main():
 
             ir_en, vis_en = model_en(ir, vis)
             irr,  fusion_Y, ir_detail = model_de(vis_en, ir, vis)
+            """output"""
             fusion_out=YCbCr2RGB(fusion_Y,Cb_vis,Cr_vis)
             fusion_out = fusion_out.squeeze(0).permute(1, 2, 0).cpu().detach().numpy()
             fusion_out = cv2.cvtColor(fusion_out, cv2.COLOR_RGB2BGR)
             cv2.imwrite(f'./out/{file}',fusion_out*255)
             print(file)
+            
 
 if __name__ == "__main__":
     main()
