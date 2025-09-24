@@ -1,16 +1,18 @@
 import torch
 from torch import nn, optim 
 #from model import *
+import os
+import sys
+os.chdir(sys.path[0])
 dtype = torch.cuda.FloatTensor
 import numpy as np 
 import matplotlib.pyplot as plt 
-import scipy.io
 import math
-from skimage.metrics import peak_signal_noise_ratio
 import random
 from PIL import Image
 from torchvision import transforms
-from FusionImageEvalution.Metric_Python.eval_one_image import evaluation_one
+DATA=f'/home/BlueDisk/Dataset/FusionDataset/RGBT/MSRS/test/'
+FILE="00131D.png"
 
 
 
@@ -24,8 +26,8 @@ def setup_seed(seed):
 setup_seed(2) 
 
 # 图像路径
-image_path_1 = r'.\data\ir2.png'
-image_path_2 = r'.\data\rgb2.png'
+image_path_1 = DATA+"/ir/"+FILE
+image_path_2 = DATA+"/vi/"+FILE
 # 加载图像
 image1 = Image.open(image_path_1)
 image2 = Image.open(image_path_2)
@@ -40,13 +42,6 @@ ir = torch.rand_like(rgb)
 ir[0,:,:] = ir2
 ir[1,:,:] = ir2
 ir[2,:,:] = ir2
-
-# ir  = convert_tensor(image1).to('cuda:0')
-# rgb2 = convert_tensor(image2).to('cuda:0')
-# rgb = torch.rand_like(ir)
-# rgb[0,:,:] = rgb2
-# rgb[1,:,:] = rgb2
-# rgb[2,:,:] = rgb2
 
 
 lr_real = 0.00025
@@ -132,15 +127,11 @@ class IR_RGB_decoder(nn.Module):
         self.decoder_rgb = rgb_decoder
 
     def forward(self, gg1, ir, rgb):
-
-        # rgb_detail = self.decoder_rgb(ir, rgb)
-        # rgb1 = gg1+rgb_detail
-        # fusion1 = ir+rgb_detail
-        # return  rgb1,  fusion1
         ir_detail = self.decoder_rgb(ir, rgb)
         ir1 = gg1 + ir_detail
-        fusion1 = rgb+ir_detail
-        return  ir1,  fusion1
+        ir_detail1 = torch.where(ir_detail< 0.2, torch.tensor(0.0).to(ir_detail.device), ir_detail)
+        fusion1 = rgb+ir_detail1
+        return  ir1,  fusion1, ir_detail1
 
 encoder_spa  = IR_Encoder()
 encoder_spec = RGB_Encoder()
@@ -149,111 +140,49 @@ params = []
 params += [x for x in model_en.parameters()]
 optimizer    = optim.Adam(params, lr=lr_real, weight_decay=1e-8) 
 
-# a = 0.5
-# median_rgb = a*ir+(1-a)*rgb
-# median_ir = (1-a)*ir+a*rgb
   
 '''------------------------------------main -----------------------------------------'''
 for iter in range(max_iter):
     
     gg, gg1 = model_en(ir, rgb)
     fusion = gg1
-    #loss1 = 1*torch.norm(rgb1-rgb,2) +  torch.norm(ir1-ir,2)
     loss2 = torch.norm(gg-gg1,2)
     loss3 = 1*torch.norm(gg1-ir,2) + 0.9*torch.norm(gg1-rgb,2)
-    loss  = 0.1*loss2 + loss3
+    loss  = 0.2*loss2 + loss3
 
     optimizer.zero_grad()
     loss.backward(retain_graph=True)
     optimizer.step()
-    # if iter % 1000 == 0:
-    #         EN, MI, SF, AG, SD, CC, SCD, VIF, MSE, PSNR, Qabf, Nabf, SSIM, MS_SSIM = evaluation_one(ir, rgb, fusion)
-    #         print('EN:', round(EN, 4))
-    #         ('MI:', round(MI, 4))
-    #         print('SF:', round(SF, 4))
-    #         print('AG:', round(AG, 4))
-    #         print('SD:', round(SD, 4))
-    #         print('CC:', round(CC, 4))
-    #         print('SCD:', round(SCD, 4))
-    #         print('VIF:', round(VIF, 4))
-    #         print('MSE:', round(MSE, 4))
-    #         print('PSNR:', round(PSNR, 4))
-    #         print('Qabf:', round(Qabf, 4))
-    #         print('Nabf:', round(Nabf, 4))
-    #         print('SSIM:', round(SSIM, 4))
-    #         print('MS_SSIM:', round(MS_SSIM, 4))
-    #         print('============================')
-        
-    # if iter % 1000 == 0:
-    #     HR_HSI = fusion
-    #     HR_HSIt = HR_HSI.permute(1,2,0)
-    #     plt.figure(figsize=(15,45))
-    #     plt.subplot(131)
-    #     plt.imshow(ir.permute(1,2,0).cpu().detach().numpy().squeeze())
-    #     plt.title('IR')
-           
-    #     plt.subplot(132)
-    #     plt.imshow(rgb.permute(1,2,0).cpu().detach().numpy())
-    #     plt.title('RGB')
-        
-    #     plt.subplot(133)
-    #     plt.imshow(HR_HSIt.cpu().detach().numpy())
-    #     plt.title('fusion')
-    #     plt.show()
-    
+  
+plt.figure(figsize=(6, 6))
+plt.imshow(gg.permute(1,2,0).cpu().detach().numpy())
+plt.axis('off')  # 关闭坐标轴
+plt.savefig('.gg.png', dpi=300, bbox_inches='tight', pad_inches=0)
+plt.close()  # 关闭图像，释放内存
+
+
 decoder_ir  = IR_Decoder()
 decoder_rgb = RGB_Decoder() 
 model_de  = IR_RGB_decoder(decoder_ir,  decoder_rgb).cuda() 
 params = []
 params += [x for x in model_de.parameters()]
 optimizer1    = optim.Adam(params, lr=lr_real, weight_decay=1e-8) 
-for iter in range(5001):
-    
-    rgb1,  fusion1 = model_de(gg1, ir, rgb)
+for iter in range(5001): 
+    irr,  fusion1, ir_detail = model_de(gg1, ir, rgb)
     fusion = fusion1
-    loss1 = torch.norm(rgb1-ir,2) 
-    
+    loss1 = torch.norm(irr-ir,2) 
     loss  = loss1
-
     optimizer1.zero_grad()
-    loss.backward(retain_graph=True)
+    loss.backward()
     optimizer1.step()
-    if iter % 1000 == 0:
-        HR_HSI = fusion
-        HR_HSIt = HR_HSI.permute(1,2,0)
-        # ps = peak_signal_noise_ratio(np.clip(HR_HSIt.cpu().detach().numpy(),0,1),gt.permute(1,2,0).cpu().detach().numpy())
-        # print('iteration:',iter,'PSNR',ps)
-        
-    if iter % 1000 == 0:
-        HR_HSI = fusion
-        HR_HSIt = HR_HSI.permute(1,2,0)
-        plt.figure(figsize=(15,45))
-        plt.subplot(131)
-        plt.imshow(ir.permute(1,2,0).cpu().detach().numpy().squeeze())
-        plt.title('IR')
-           
-        plt.subplot(132)
-        plt.imshow(rgb.permute(1,2,0).cpu().detach().numpy())
-        plt.title('RGB')
-        
-        plt.subplot(133)
-        plt.imshow(HR_HSIt.cpu().detach().numpy())
-        plt.title('fusion')
-        plt.show()
-        
-        EN, MI, SF, AG, SD, CC, SCD, VIF, MSE, PSNR, Qabf, Nabf, SSIM, MS_SSIM = evaluation_one(ir, rgb, fusion)
-        print('EN:', round(EN, 4))
-        print('MI:', round(MI, 4))
-        print('SF:', round(SF, 4))
-        print('AG:', round(AG, 4))
-        print('SD:', round(SD, 4))
-        print('CC:', round(CC, 4))
-        print('SCD:', round(SCD, 4))
-        print('VIF:', round(VIF, 4))
-        print('MSE:', round(MSE, 4))
-        print('PSNR:', round(PSNR, 4))
-        print('Qabf:', round(Qabf, 4))
-        print('Nabf:', round(Nabf, 4))
-        print('SSIM:', round(SSIM, 4))
-        print('MS_SSIM:', round(MS_SSIM, 4))
-        print('============================')
+    
+plt.figure(figsize=(6, 6))
+plt.axis('off')  # 关闭坐标轴
+plt.savefig(r'.fusion_irvis.png', dpi=300, bbox_inches='tight', pad_inches=0)
+plt.close()  # 关闭图像，释放内存
+
+plt.figure(figsize=(6, 6))
+
+plt.axis('off')  # 关闭坐标轴
+plt.savefig(r'.feature_irvis.png', dpi=300, bbox_inches='tight', pad_inches=0)
+plt.close()  # 关闭图像，释放内存

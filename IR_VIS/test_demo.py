@@ -18,7 +18,7 @@ def main():
     decoder_ir  = IR_Decoder()
     decoder_vis = RGB_Decoder() 
     model_en  = Encoder(encoder_ir,  encoder_vis).cuda()
-    model_de  = Decoder(decoder_ir,  decoder_vis).cuda() 
+    model_de  = Decoder().cuda() 
     """load checkpoints"""
     model_en.load_state_dict(torch.load(WEIGHTS_ENCODER))
     model_de.load_state_dict(torch.load(WEIGHTS_DECODER))
@@ -36,15 +36,16 @@ def main():
 
         ir_en, vis_en = model_en(ir, vis)
         irr,  fusion_Y, ir_detail = model_de(vis_en, ir, vis)
-        # fusion_out=YCbCr2RGB(fusion_Y,Cb_vis,Cr_vis)
-        # fusion_out = fusion_out.squeeze(0).permute(1, 2, 0).cpu().detach().numpy()
-        # fusion_out = cv2.cvtColor(fusion_out, cv2.COLOR_RGB2BGR)
-        # cv2.imwrite(f'./out/{FILE}',fusion_out*255)
+
+        fusion_out=YCbCr2RGB(fusion_Y,Cb_vis,Cr_vis)
+        fusion_out = fusion_out.squeeze(0).permute(1, 2, 0).cpu().detach().numpy()
+        fusion_out = cv2.cvtColor(fusion_out, cv2.COLOR_RGB2BGR)
+        cv2.imwrite(f'./out/{FILE}',fusion_out*255)
         """output"""
-        ir_detail = Y_vis.squeeze(0).permute(1, 2, 0).cpu().detach().numpy()
-        ir_detail = cv2.cvtColor(ir_detail, cv2.COLOR_RGB2BGR)
-        cv2.imwrite(f'./out/{FILE}',ir_detail*255)
-        print(FILE)
+        # ir_detail = ir_en.squeeze(0).permute(1, 2, 0).cpu().detach().numpy()
+        # ir_detail = cv2.cvtColor(ir_detail, cv2.COLOR_RGB2BGR)
+        # cv2.imwrite(f'./out/{FILE}',ir_detail*255)
+        # print(FILE)
 
 if __name__ == "__main__":
     main()

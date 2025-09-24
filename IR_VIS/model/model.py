@@ -45,15 +45,14 @@ class IR_Encoder(nn.Module):
 class RGB_Decoder(nn.Module): 
     def __init__(self):
         super(RGB_Decoder, self).__init__()
-        self.conv3 = torch.nn.Conv2d(2,   3, kernel_size=1, padding=0)
-        self.conv4 = torch.nn.Conv2d(5,   1, kernel_size=3, padding=1)
+        self.conv1 = torch.nn.Conv2d(1,   3, kernel_size=11, padding=5)   
+        self.conv2 = torch.nn.Conv2d(4,   1, kernel_size=9, padding=4) 
         
-    def forward(self, x, y):
-        x = torch.cat([x,y],dim=1)
-        x1 = torch.sin(self.conv3(x))
+    def forward(self, x):
+        x1 = torch.sin(self.conv1(x))
         x2 = torch.cat([x,x1],dim=1)
-        x3 = self.conv4(x2)
-        return x3 #1 W H
+        x3 = self.conv2(x2)
+        return x3
     
 class IR_Decoder(nn.Module):
     def __init__(self):
@@ -79,13 +78,32 @@ class Encoder(nn.Module):
         return ir_en, vis_en 
     
 class Decoder(nn.Module):
-    def __init__(self, ir_decoder, rgb_decoder):
+    def __init__(self):
         super(Decoder, self).__init__()
-        self.decoder_ir  = ir_decoder
-        self.decoder_rgb = rgb_decoder
+        self.conv3 = nn.Sequential(
+            nn.Conv2d(2, 16, kernel_size=1),       # 1x1 卷积扩展通道
+            nn.BatchNorm2d(16),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(16, 16, kernel_size=3, padding=1),  # 3x3 卷积增加感受野
+            nn.BatchNorm2d(16),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(16, 3, kernel_size=1)       # 输出3通道
+        )
+
+
+        self.conv4 = nn.Sequential(
+            nn.Conv2d(5, 32, kernel_size=3, padding=1),  # 增加中间通道
+            nn.BatchNorm2d(32),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(32, 1, kernel_size=3, padding=1)   # 输出1通道 IR detail
+        )
 
     def forward(self,vis_en, ir, vis):
-        ir_detail = self.decoder_rgb(ir, vis)
+        x = torch.cat([ir,vis],dim=1)
+        x1 = torch.sin(self.conv3(x))
+        x2 = torch.cat([x,x1],dim=1)
+        ir_detail = self.conv4(x2)
+        #ir_detail=ir - vis_en
         ir1 = vis_en + ir_detail
         ir_detail = torch.where(ir_detail< 0, torch.tensor(0.0).to(ir_detail.device), ir_detail)
         fusion1 = vis+ir_detail

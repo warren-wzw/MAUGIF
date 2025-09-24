@@ -1,4 +1,5 @@
 import os
+from socket import CAN_ISOTP
 import sys
 os.chdir(sys.path[0])
 from PIL import Image
@@ -17,7 +18,7 @@ def main():
     decoder_ir  = IR_Decoder()
     decoder_vis = RGB_Decoder() 
     model_en  = Encoder(encoder_ir,  encoder_vis).cuda()
-    model_de  = Decoder(decoder_ir,  decoder_vis).cuda() 
+    model_de  = Decoder().cuda() 
     """load checkpoints"""
     model_en.load_state_dict(torch.load(WEIGHTS_ENCODER))
     model_de.load_state_dict(torch.load(WEIGHTS_DECODER))
@@ -35,7 +36,7 @@ def main():
             vis=Y_vis
 
             ir_en, vis_en = model_en(ir, vis)
-            irr,  fusion_Y, ir_detail = model_de(vis_en, ir, vis)
+            irr,  fusion_Y, ir_detail = model_de(ir_en+vis_en, ir, vis)
             """output"""
             fusion_out=YCbCr2RGB(fusion_Y,Cb_vis,Cr_vis)
             fusion_out = fusion_out.squeeze(0).permute(1, 2, 0).cpu().detach().numpy()
