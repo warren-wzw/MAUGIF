@@ -1,6 +1,7 @@
-data/
-functions/
 IR_VIS/out/
+MultiFocus/out/
+Medical/out/
 Done/
 FusionImageEvalution/
 __pycache__/
+.vscode/
