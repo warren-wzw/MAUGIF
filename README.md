@@ -1,5 +1,6 @@
-# DiFusionSeg
-This is official Pytorch implementation of "[xxxxxxxxxxxxxx]()"
+# CDAE
+This is official Pytorch implementation of "[Mechanism-Aware Image Fusion: An Interpretable and General Framework via
+Cross Dual Autoencoders]()"
  - 
 ```
 @article{
@@ -62,7 +63,7 @@ python
 python test_demo.py --img="./images/00131D_vi.png" --ir="./images/00131D_ir.png" --checkpoint="./exps/Done/msrs_vi_ir_meanstd_ConvNext_fusioncomplex_8083/best.pth" --segout="./seg.png"
 ```
 ### To Train
-Before training DiFusionSeg, you need to download the MSRS dataset MSRS and putting it in ./datasets.
+Before training CDAE, you need to download the MSRS dataset MSRS and putting it in ./datasets.
 
 Then running 
 python
