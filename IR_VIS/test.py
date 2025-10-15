@@ -5,8 +5,10 @@ os.chdir(sys.path[0])
 from PIL import Image
 from torchvision import transforms
 import cv2
+from thop import profile
 from model.model import *
 from model.utils import *
+import time
 
 WEIGHTS_ENCODER = './checkpoints/model_en.pt'
 WEIGHTS_DECODER = './checkpoints/model_de.pt'
@@ -24,6 +26,7 @@ def main():
     model_de.load_state_dict(torch.load(WEIGHTS_DECODER))
     files=os.listdir(DATA+"/vi/")
     convert_tensor = transforms.ToTensor()
+    start=time.time()
     with torch.no_grad():
         for file in files:
             vis=DATA+'vi/'+file
@@ -37,12 +40,26 @@ def main():
 
             ir_en, vis_en = model_en(ir, vis)
             irr,  fusion_Y, ir_detail = model_de(ir_en+vis_en, ir, vis)
+            """FLOPS"""
+            # flops, params = profile(model_en, inputs=(ir,vis))
+            # gflops = flops / 1e9  # 除以 10^9 转换为 GFLOPs
+            # params_million = params / 1e6  # 除以 10^6 转换为百万个参数
+            # print(f"Total FLOPs: {gflops:.2f} GFLOPs") 
+            # print(f"Total Parameters: {params_million:.2f} M") 
+            
+            # flops, params = profile(model_de, inputs=(ir_en+vis_en,ir,vis))
+            # gflops = flops / 1e9  # 除以 10^9 转换为 GFLOPs
+            # params_million = params / 1e6  # 除以 10^6 转换为百万个参数
+            # print(f"Total FLOPs: {gflops:.2f} GFLOPs") 
+            # print(f"Total Parameters: {params_million:.2f} M") 
             """output"""
             fusion_out=YCbCr2RGB(fusion_Y,Cb_vis,Cr_vis)
             fusion_out = fusion_out.squeeze(0).permute(1, 2, 0).cpu().detach().numpy()
             fusion_out = cv2.cvtColor(fusion_out, cv2.COLOR_RGB2BGR)
             cv2.imwrite(f'./out/{file}',fusion_out*255)
             print(file)
+    end=time.time()
+    print(end-start)
             
 
 if __name__ == "__main__":

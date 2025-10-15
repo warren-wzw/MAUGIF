@@ -1,6 +1,5 @@
-# CDAE
-This is official Pytorch implementation of "[Mechanism-Aware Image Fusion: An Interpretable and General Framework via
-Cross Dual Autoencoders]()"
+# MAUGIF
+This is official Pytorch implementation of "[MAUGIF: An  Mechanism-Aware Unsupervised General Image Fusion   Framework via Cross Dual Autoencoders]()"
  - 
 ```
 @article{

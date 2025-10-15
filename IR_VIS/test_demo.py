@@ -6,12 +6,17 @@ from torchvision import transforms
 import cv2
 from model.model import *
 from model.utils import *
+import time
 
 WEIGHTS_ENCODER = './checkpoints/model_en.pt'
 WEIGHTS_DECODER = './checkpoints/model_de.pt'
 DATA=f'/home/BlueDisk/Dataset/FusionDataset/RGBT/MSRS/test/'
 FILE="00131D.png"
-    
+
+def count_params(model):
+    params_million=sum(p.numel() for p in model.parameters() if p.requires_grad) / 1e6 
+    print(f"Total Parameters: {params_million:.6f}M")
+     
 def main():
     encoder_ir  = IR_Encoder()
     encoder_vis = RGB_Encoder() 
@@ -24,6 +29,7 @@ def main():
     model_de.load_state_dict(torch.load(WEIGHTS_DECODER))
     files=os.listdir(DATA+"/vi/")
     convert_tensor = transforms.ToTensor()
+    start=time.time()
     with torch.no_grad():
         vis=DATA+'vi/'+FILE
         ir=DATA+'ir/'+FILE
@@ -33,7 +39,8 @@ def main():
         ir = convert_tensor(image2).to('cuda:0').unsqueeze(0)
         Y_vis,Cb_vis,Cr_vis= RGB2YCrCb(vis.unsqueeze(0))
         vis=Y_vis
-
+        # count_params(model_en)
+        # count_params(model_de)
         ir_en, vis_en = model_en(ir, vis)
         irr,  fusion_Y, ir_detail = model_de(vis_en, ir, vis)
 
@@ -46,6 +53,8 @@ def main():
         # ir_detail = cv2.cvtColor(ir_detail, cv2.COLOR_RGB2BGR)
         # cv2.imwrite(f'./out/{FILE}',ir_detail*255)
         # print(FILE)
+    end=time.time()
+    print(end-start)
 
 if __name__ == "__main__":
     main()

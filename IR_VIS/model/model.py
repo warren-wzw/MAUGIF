@@ -105,7 +105,7 @@ class Decoder(nn.Module):
         ir_detail = self.conv4(x2)
         #ir_detail=ir - vis_en
         ir1 = vis_en + ir_detail
-        ir_detail = torch.where(ir_detail< 0, torch.tensor(0.0).to(ir_detail.device), ir_detail)
+        ir_detail = torch.where(ir_detail< -0.50, torch.tensor(0.0).to(ir_detail.device), ir_detail)
         fusion1 = vis+ir_detail
         return  ir1,  fusion1, ir_detail
     
