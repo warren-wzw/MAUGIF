@@ -10,7 +10,7 @@ from model.utils import *
 
 WEIGHTS_ENCODER = './checkpoints/model_en.pt'
 WEIGHTS_DECODER = './checkpoints/model_de.pt'
-DATA=f'/home/BlueDisk/Dataset/FusionDataset/RGBT/MSRS/test/'
+DATA=f'/home/BlueDisk/Dataset/FusionDataset/Done/MultiFocus_MFI-WHU/test/'
     
 def main():
     encoder_ir  = IR_Encoder()

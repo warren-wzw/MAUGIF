@@ -1,5 +1,5 @@
 # MAUGIF
-This is official Pytorch implementation of "[MAUGIF: An  Mechanism-Aware Unsupervised General Image Fusion   Framework via Cross Dual Autoencoders]()"
+This is official Pytorch implementation of "[MAUGIF: Mechanism-Aware Unsupervised General Image Fusion via Dual Cross-Image Autoencoders]()"
  - 
 ```
 @article{
@@ -59,10 +59,10 @@ python test_model.py
 ### run sample
 python
 ```
-python test_demo.py --img="./images/00131D_vi.png" --ir="./images/00131D_ir.png" --checkpoint="./exps/Done/msrs_vi_ir_meanstd_ConvNext_fusioncomplex_8083/best.pth" --segout="./seg.png"
+python test_demo.py --img="./images/00131D_vi.png" --ir="./images/00131D_ir.png" --checkpoint="xxx.pth"
 ```
 ### To Train
-Before training CDAE, you need to download the MSRS dataset MSRS and putting it in ./datasets.
+Before training MAUGIF, you need to download the MSRS dataset MSRS and putting it in ./datasets.
 
 Then running 
 python

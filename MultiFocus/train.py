@@ -21,8 +21,8 @@ from model.loss import *
 DEVICE=torch.device("cuda" if torch.cuda.is_available() else "cpu")
 BATCH_SIZE=8
 EPOCH=100
-image_path_rgb = f'/home/BlueDisk/Dataset/FusionDataset/RGBT/MSRS/train/vi/'
-image_path_ir = f'/home/BlueDisk/Dataset/FusionDataset/RGBT/MSRS/train/ir/'
+image_path_rgb = f'/home/BlueDisk/Dataset/FusionDataset/Done/MultiFocus_MFI-WHU/train/vi/'
+image_path_ir = f'/home/BlueDisk/Dataset/FusionDataset/Done/MultiFocus_MFI-WHU/train/ir/'
 
 
 def setup_seed(seed):
@@ -58,41 +58,41 @@ def main():
     optimizer_de    = optim.Adam(model_de.parameters(), lr=lr_real, weight_decay=1e-8)  
 
     """Encoder training"""
-    # best_loss = float("inf")  
-    # best_epoch = -1
-    # model_en.train()
-    # torch.cuda.empty_cache()
-    # for epoch_index in range(EPOCH):
-    #     loss_sum=0
-    #     train_iterator = tqdm(dataloader_train, initial=0,desc="Iter", disable=False)
-    #     for step, (vis, ir) in enumerate(train_iterator):
-    #         vis, ir= vis.to(DEVICE),ir.to(DEVICE) #b 3 H W b 1 H W  
-    #         Y_vis,_,_= RGB2YCrCb(vis)
-    #         vis=Y_vis
-    #         ir_en, vis_en = model_en(ir, vis) #b 1 H W b 1 H W->
-    #         ir_pred=decoder_ir(ir_en)
-    #         vis_pred=decoder_vis(vis_en)
-    #         loss2 = torch.norm(ir_en-vis_en,2)
-    #         loss3 = 1*torch.norm(vis_en-ir,2) + 0.9*torch.norm(vis_en-Y_vis,2)
-    #         loss4=torch.norm(vis_pred-vis,2) + torch.norm(ir_pred-ir,2)
-    #         loss  = 0.2*loss2 + loss3+0*loss4
-    #         optimizer_en.zero_grad()
-    #         loss.backward()
-    #         optimizer_en.step()
-    #         loss_sum=loss_sum+loss.item()
-    #         avg_loss = loss_sum / (step + 1)
-    #         train_iterator.set_description(f"Epoch={epoch_index} loss={avg_loss:.6f}")
-    #         # ir_detail = vis_en[0].permute(1, 2, 0).cpu().detach().numpy()
-    #         # ir_detail = cv2.cvtColor(ir_detail, cv2.COLOR_RGB2BGR)
-    #         # cv2.imwrite(f'./out/tmp.png',ir_detail*255)
-    #     epoch_loss = loss_sum / len(train_iterator)
+    best_loss = float("inf")  
+    best_epoch = -1
+    model_en.train()
+    torch.cuda.empty_cache()
+    for epoch_index in range(EPOCH):
+        loss_sum=0
+        train_iterator = tqdm(dataloader_train, initial=0,desc="Iter", disable=False)
+        for step, (vis, ir) in enumerate(train_iterator):
+            vis, ir= vis.to(DEVICE),ir.to(DEVICE) #b 3 H W b 1 H W  
+            Y_vis,_,_= RGB2YCrCb(vis)
+            vis=Y_vis
+            ir_en, vis_en = model_en(ir, vis) #b 1 H W b 1 H W->
+            ir_pred=decoder_ir(ir_en)
+            vis_pred=decoder_vis(vis_en)
+            loss2 = torch.norm(ir_en-vis_en,2)
+            loss3 = 1*torch.norm(vis_en-ir,2) + 0.9*torch.norm(vis_en-Y_vis,2)
+            loss4=torch.norm(vis_pred-vis,2) + torch.norm(ir_pred-ir,2)
+            loss  = 0.2*loss2 + loss3+0*loss4
+            optimizer_en.zero_grad()
+            loss.backward()
+            optimizer_en.step()
+            loss_sum=loss_sum+loss.item()
+            avg_loss = loss_sum / (step + 1)
+            train_iterator.set_description(f"Epoch={epoch_index} loss={avg_loss:.6f}")
+            # ir_detail = vis_en[0].permute(1, 2, 0).cpu().detach().numpy()
+            # ir_detail = cv2.cvtColor(ir_detail, cv2.COLOR_RGB2BGR)
+            # cv2.imwrite(f'./out/tmp.png',ir_detail*255)
+        epoch_loss = loss_sum / len(train_iterator)
         
         
-    #     if epoch_loss < best_loss:
-    #         best_loss = epoch_loss
-    #         torch.save(model_en.state_dict(), "./checkpoints/model_en.pt")
-    #         print(f"✔ Epoch {epoch_index}: new best model saved with loss {best_loss:.6f}")
-    # print("Enoder training done")
+        if epoch_loss < best_loss:
+            best_loss = epoch_loss
+            torch.save(model_en.state_dict(), "./checkpoints/model_en.pt")
+            print(f"✔ Epoch {epoch_index}: new best model saved with loss {best_loss:.6f}")
+    print("Enoder training done")
 
     """Decoder training"""
     best_loss = float("inf")  

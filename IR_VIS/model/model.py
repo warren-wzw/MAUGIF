@@ -81,21 +81,20 @@ class Decoder(nn.Module):
     def __init__(self):
         super(Decoder, self).__init__()
         self.conv3 = nn.Sequential(
-            nn.Conv2d(2, 16, kernel_size=1),       # 1x1 卷积扩展通道
+            nn.Conv2d(2, 16, kernel_size=1),       # 1x1
             nn.BatchNorm2d(16),
             nn.ReLU(inplace=True),
-            nn.Conv2d(16, 16, kernel_size=3, padding=1),  # 3x3 卷积增加感受野
+            nn.Conv2d(16, 16, kernel_size=3, padding=1),  # 3x3 
             nn.BatchNorm2d(16),
             nn.ReLU(inplace=True),
-            nn.Conv2d(16, 3, kernel_size=1)       # 输出3通道
+            nn.Conv2d(16, 3, kernel_size=1)       # 
         )
 
-
         self.conv4 = nn.Sequential(
-            nn.Conv2d(5, 32, kernel_size=3, padding=1),  # 增加中间通道
+            nn.Conv2d(5, 32, kernel_size=3, padding=1),  # 
             nn.BatchNorm2d(32),
             nn.ReLU(inplace=True),
-            nn.Conv2d(32, 1, kernel_size=3, padding=1)   # 输出1通道 IR detail
+            nn.Conv2d(32, 1, kernel_size=3, padding=1)   # IR detail
         )
 
     def forward(self,vis_en, ir, vis):
@@ -103,7 +102,6 @@ class Decoder(nn.Module):
         x1 = torch.sin(self.conv3(x))
         x2 = torch.cat([x,x1],dim=1)
         ir_detail = self.conv4(x2)
-        #ir_detail=ir - vis_en
         ir1 = vis_en + ir_detail
         ir_detail = torch.where(ir_detail< -0.50, torch.tensor(0.0).to(ir_detail.device), ir_detail)
         fusion1 = vis+ir_detail
