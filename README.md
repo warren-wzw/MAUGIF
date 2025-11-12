@@ -17,6 +17,8 @@ This is official Pytorch implementation of "[MAUGIF: Mechanism-Aware Unsupervise
 ```
 MAUGIF/
 ├── HSI-MSI
+│   ├── demo_hsms.py
+│   └── network.py
 ├── images
 │   ├── HMF.png
 │   ├── Medical.png
