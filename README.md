@@ -92,7 +92,7 @@ python test_model.py
 ### run sample
 python
 ```
-python test_demo.py
+python test_demo.py --img="xxxx.png" --ir="xxxx.png"
 ```
 ### To Train
 Before training MAUGIF, you need to download the MSRS dataset MSRS and putting it in ./datasets.

@@ -42,14 +42,14 @@ def main():
             irr,  fusion_Y, ir_detail = model_de(ir_en+vis_en, ir, vis)
             """FLOPS"""
             # flops, params = profile(model_en, inputs=(ir,vis))
-            # gflops = flops / 1e9  # 除以 10^9 转换为 GFLOPs
-            # params_million = params / 1e6  # 除以 10^6 转换为百万个参数
+            # gflops = flops / 1e9  
+            # params_million = params / 1e6  
             # print(f"Total FLOPs: {gflops:.2f} GFLOPs") 
             # print(f"Total Parameters: {params_million:.2f} M") 
             
             # flops, params = profile(model_de, inputs=(ir_en+vis_en,ir,vis))
-            # gflops = flops / 1e9  # 除以 10^9 转换为 GFLOPs
-            # params_million = params / 1e6  # 除以 10^6 转换为百万个参数
+            # gflops = flops / 1e9  
+            # params_million = params / 1e6  # 
             # print(f"Total FLOPs: {gflops:.2f} GFLOPs") 
             # print(f"Total Parameters: {params_million:.2f} M") 
             """output"""

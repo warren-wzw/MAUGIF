@@ -6,6 +6,7 @@ from torchvision import transforms
 import cv2
 from model.model import *
 from model.utils import *
+from argparse import ArgumentParser
 
 WEIGHTS_ENCODER = './checkpoints/model_en.pt'
 WEIGHTS_DECODER = './checkpoints/model_de.pt'
@@ -13,6 +14,11 @@ DATA=f'/home/BlueDisk/Dataset/FusionDataset/Done/MedicalImage/test/'
 FILE="00131D.png"
     
 def main():
+    parser = ArgumentParser()
+    parser.add_argument('--img',default=DATA+'img/'+FILE, help='img file')
+    parser.add_argument('--mri',default=DATA+'mri/'+FILE,
+                        help='mri file')
+    args = parser.parse_args()
     encoder_ir  = IR_Encoder()
     encoder_vis = RGB_Encoder() 
     decoder_ir  = IR_Decoder()
@@ -25,8 +31,9 @@ def main():
     files=os.listdir(DATA+"/img/")
     convert_tensor = transforms.ToTensor()
     with torch.no_grad():
-        vis=DATA+'img/'+FILE
-        ir=DATA+'mri/'+FILE
+        vis=args.img
+        ir=args.ir
+        file_name=os.path.basename(vis)
         image1 = Image.open(vis)
         image2 = Image.open(ir).convert("L")
         vis  = convert_tensor(image1).to('cuda:0')
@@ -40,7 +47,7 @@ def main():
         fusion_out=YCbCr2RGB(fusion_Y,Cb_vis,Cr_vis)
         fusion_out = fusion_out.squeeze(0).permute(1, 2, 0).cpu().detach().numpy()
         fusion_out = cv2.cvtColor(fusion_out, cv2.COLOR_RGB2BGR)
-        cv2.imwrite(f'./out/{FILE}',fusion_out*255)
+        cv2.imwrite(f'./out/{file_name}',fusion_out*255)
 
 
 if __name__ == "__main__":

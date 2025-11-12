@@ -6,6 +6,7 @@ from torchvision import transforms
 import cv2
 from model.model import *
 from model.utils import *
+from argparse import ArgumentParser
 
 WEIGHTS_ENCODER = './checkpoints/model_en.pt'
 WEIGHTS_DECODER = './checkpoints/model_de.pt'
@@ -13,6 +14,11 @@ DATA=f'/home/BlueDisk/Dataset/FusionDataset/RGBT/MultiFocus/test/'
 FILE="00131D.png"
     
 def main():
+    parser = ArgumentParser()
+    parser.add_argument('--far',default=DATA+'FAR/'+FILE, help='rgb file')
+    parser.add_argument('--near',default=DATA+'NEAR/'+FILE,
+                        help='ir file')
+    args = parser.parse_args()
     encoder_ir  = IR_Encoder()
     encoder_vis = RGB_Encoder() 
     decoder_ir  = IR_Decoder()
@@ -25,8 +31,9 @@ def main():
     files=os.listdir(DATA+"/FAR/")
     convert_tensor = transforms.ToTensor()
     with torch.no_grad():
-        vis=DATA+'FAR/'+FILE
-        ir=DATA+'Near/'+FILE
+        vis=args.far
+        ir=args.near
+        file_name=os.path.basename(vis)
         image1 = Image.open(vis)
         image2 = Image.open(ir).convert("L")
         vis  = convert_tensor(image1).to('cuda:0')

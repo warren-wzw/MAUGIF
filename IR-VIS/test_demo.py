@@ -7,6 +7,7 @@ import cv2
 from model.model import *
 from model.utils import *
 import time
+from argparse import ArgumentParser
 
 WEIGHTS_ENCODER = './checkpoints/model_en.pt'
 WEIGHTS_DECODER = './checkpoints/model_de.pt'
@@ -18,6 +19,11 @@ def count_params(model):
     print(f"Total Parameters: {params_million:.6f}M")
      
 def main():
+    parser = ArgumentParser()
+    parser.add_argument('--img',default=DATA+'vi/'+FILE, help='rgb file')
+    parser.add_argument('--ir',default=DATA+'ir/'+FILE,
+                        help='ir file')
+    args = parser.parse_args()
     encoder_ir  = IR_Encoder()
     encoder_vis = RGB_Encoder() 
     decoder_ir  = IR_Decoder()
@@ -31,8 +37,9 @@ def main():
     convert_tensor = transforms.ToTensor()
     start=time.time()
     with torch.no_grad():
-        vis=DATA+'vi/'+FILE
-        ir=DATA+'ir/'+FILE
+        vis=args.img
+        ir=args.ir
+        file_name=os.path.basename(vis)
         image1 = Image.open(vis)
         image2 = Image.open(ir).convert("L")
         vis  = convert_tensor(image1).to('cuda:0')
@@ -47,12 +54,7 @@ def main():
         fusion_out=YCbCr2RGB(fusion_Y,Cb_vis,Cr_vis)
         fusion_out = fusion_out.squeeze(0).permute(1, 2, 0).cpu().detach().numpy()
         fusion_out = cv2.cvtColor(fusion_out, cv2.COLOR_RGB2BGR)
-        cv2.imwrite(f'./out/{FILE}',fusion_out*255)
-        """output"""
-        # ir_detail = ir_en.squeeze(0).permute(1, 2, 0).cpu().detach().numpy()
-        # ir_detail = cv2.cvtColor(ir_detail, cv2.COLOR_RGB2BGR)
-        # cv2.imwrite(f'./out/{FILE}',ir_detail*255)
-        # print(FILE)
+        cv2.imwrite(f'./out/{file_name}',fusion_out*255)
     end=time.time()
     print(end-start)
 
