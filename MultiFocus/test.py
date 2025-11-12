@@ -22,12 +22,12 @@ def main():
     """load checkpoints"""
     model_en.load_state_dict(torch.load(WEIGHTS_ENCODER))
     model_de.load_state_dict(torch.load(WEIGHTS_DECODER))
-    files=os.listdir(DATA+"/vi/")
+    files=os.listdir(DATA+"/FAR/")
     convert_tensor = transforms.ToTensor()
     with torch.no_grad():
         for file in files:
-            vis=DATA+'vi/'+file
-            ir=DATA+'ir/'+file
+            vis=DATA+'FAR/'+file
+            ir=DATA+'NEAR/'+file
             image1 = Image.open(vis)
             image2 = Image.open(ir).convert("L")
             vis  = convert_tensor(image1).to('cuda:0')

@@ -21,8 +21,8 @@ from model.loss import *
 DEVICE=torch.device("cuda" if torch.cuda.is_available() else "cpu")
 BATCH_SIZE=8
 EPOCH=100
-image_path_rgb = f'/home/BlueDisk/Dataset/FusionDataset/Done/MultiFocus_MFI-WHU/train/vi/'
-image_path_ir = f'/home/BlueDisk/Dataset/FusionDataset/Done/MultiFocus_MFI-WHU/train/ir/'
+image_path_rgb = f'/home/BlueDisk/Dataset/FusionDataset/Done/MultiFocus_MFI-WHU/train/FAR/'
+image_path_ir = f'/home/BlueDisk/Dataset/FusionDataset/Done/MultiFocus_MFI-WHU/train/NEAR/'
 
 
 def setup_seed(seed):

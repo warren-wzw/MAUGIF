@@ -9,7 +9,7 @@ from model.utils import *
 
 WEIGHTS_ENCODER = './checkpoints/model_en.pt'
 WEIGHTS_DECODER = './checkpoints/model_de.pt'
-DATA=f'/home/BlueDisk/Dataset/FusionDataset/RGBT/MSRS/test/'
+DATA=f'/home/BlueDisk/Dataset/FusionDataset/Done/MedicalImage/test/'
 FILE="00131D.png"
     
 def main():
@@ -22,11 +22,11 @@ def main():
     """load checkpoints"""
     model_en.load_state_dict(torch.load(WEIGHTS_ENCODER))
     model_de.load_state_dict(torch.load(WEIGHTS_DECODER))
-    files=os.listdir(DATA+"/vi/")
+    files=os.listdir(DATA+"/img/")
     convert_tensor = transforms.ToTensor()
     with torch.no_grad():
-        vis=DATA+'vi/'+FILE
-        ir=DATA+'ir/'+FILE
+        vis=DATA+'img/'+FILE
+        ir=DATA+'mri/'+FILE
         image1 = Image.open(vis)
         image2 = Image.open(ir).convert("L")
         vis  = convert_tensor(image1).to('cuda:0')
@@ -41,11 +41,7 @@ def main():
         fusion_out = fusion_out.squeeze(0).permute(1, 2, 0).cpu().detach().numpy()
         fusion_out = cv2.cvtColor(fusion_out, cv2.COLOR_RGB2BGR)
         cv2.imwrite(f'./out/{FILE}',fusion_out*255)
-        """output"""
-        # ir_detail = ir_en.squeeze(0).permute(1, 2, 0).cpu().detach().numpy()
-        # ir_detail = cv2.cvtColor(ir_detail, cv2.COLOR_RGB2BGR)
-        # cv2.imwrite(f'./out/{FILE}',ir_detail*255)
-        # print(FILE)
+
 
 if __name__ == "__main__":
     main()
