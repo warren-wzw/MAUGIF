@@ -50,7 +50,7 @@ MAUGIF/
 
 ## Experiments 
 ### Dataset & Checkpoints & Results
-The checkpoints and results can be in [xxx](). 
+The results can be in [MAUGIF](https://www.dropbox.com/scl/fo/cmzser4ibtza4afqqw9yh/ABNRa83qn3rh1P_5UwTpWno?rlkey=u3ytba9dmblnv1w0y8lnbgk3h&st=x526zldf&dl=0). 
 Download MSRS dataset from [xxx]() 
 If you need to evaluate other datasets, please organize them as follows:
 ```
@@ -91,7 +91,7 @@ python test_model.py
 ### run sample
 python
 ```
-python test_demo.py --img="./images/00131D_vi.png" --ir="./images/00131D_ir.png" --checkpoint="xxx.pth"
+python test_demo.py
 ```
 ### To Train
 Before training MAUGIF, you need to download the MSRS dataset MSRS and putting it in ./datasets.
