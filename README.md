@@ -14,6 +14,7 @@ This is official Pytorch implementation of "[MAUGIF: Mechanism-Aware Unsupervise
  - [ ] cudatoolkit 11.8
  - [ ] torchvision 0.14.0
 ## The architecture of the project is shown as follows:
+```
 MAUGIF/
 ├── HSI-MSI
 ├── images
@@ -43,8 +44,8 @@ MAUGIF/
 │   ├── test_demo.py
 │   ├── test.py
 │   └── train.py
-├── README.md
-
+└── README.md
+```
 
 
 ## Experiments 
