@@ -6,7 +6,7 @@ This is official Pytorch implementation of "[MAUGIF: Mechanism-Aware Unsupervise
 }
 ```
 ## Framework
-![image]()
+![image](./images/ModelArch.png)
 
 ## Recommended Environment
  - [ ] torch  1.13.1
