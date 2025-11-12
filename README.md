@@ -3,6 +3,7 @@ This is official Pytorch implementation of "[MAUGIF: Mechanism-Aware Unsupervise
  - 
 ```
 @article{
+
 }
 ```
 ## Framework
@@ -12,6 +13,38 @@ This is official Pytorch implementation of "[MAUGIF: Mechanism-Aware Unsupervise
  - [ ] torch  1.13.1
  - [ ] cudatoolkit 11.8
  - [ ] torchvision 0.14.0
+## The architecture of the project is shown as follows:
+MAUGIF/
+├── HSI-MSI
+├── images
+│   ├── HMF.png
+│   ├── Medical.png
+│   ├── MFF.png
+│   ├── ModelArch.png
+│   └── VIF.png
+├── IR-VIS
+│   ├── checkpoints
+│   ├── model
+│   ├── out
+│   ├── test_demo.py
+│   ├── test.py
+│   └── train.py
+├── MedicalImage
+│   ├── checkpoints
+│   ├── model
+│   ├── out
+│   ├── test_demo.py
+│   ├── test.py
+│   └── train.py
+├── MultiFocus
+│   ├── checkpoints
+│   ├── model
+│   ├── out
+│   ├── test_demo.py
+│   ├── test.py
+│   └── train.py
+├── README.md
+
 
 
 ## Experiments 
@@ -21,34 +54,32 @@ Download MSRS dataset from [xxx]()
 If you need to evaluate other datasets, please organize them as follows:
 ```
 ├── /dataset
-    MSRS/
-    ├── test
-    │   ├── ir
-    │   ├── Segmentation_labels
-    │   ├── Segmentation_visualize
-    │   └── vi
-    └── train
-        ├── ir
-        ├── Segmentation_labels
-        └── vi
-    MFD/
-    ├── test
-    │   ├── ir
-    │   ├── Segmentation_labels
-    │   ├── Segmentation_visualize
-    │   └── vi
-    ├── test_day
-    │   ├── ir
-    │   ├── Segmentation_labels
-    │   └── vi
-    ├── test_night
-    │   ├── ir
-    │   ├── Segmentation_labels
-    │   └── vi
-    └── train
-        ├── ir
-        ├── Segmentation_labels
-        └── vi
+|
+|───VIF/
+|   ├── test
+|   │   ├── ir
+|   │   └── vi
+|   └── train
+|        ├── ir
+|        └── vi
+|───MFF/
+|   ├── test
+|   │   ├── FAR
+|   │   └── NEAR
+|   └── train
+|        ├── FAR
+|        └── NEAR
+└───MEF/
+    ├── CT_MRI
+    │   ├── MRI
+    │   └── CT
+    |── PET_MRI
+    |    ├── MRI
+    |    └── PET
+    └── SPECT_MRI
+         ├── MRI
+         └── SPECT
+
     ......
 ```
 ### Evaluate model
@@ -70,7 +101,10 @@ python
 python train_model.py
 ```
 ### Fusion comparison
-![image]()
+![image](./images/HMF.png)
+![image](./images/VIF.png)
+![image](./images/MFF.png)
+![image](./images/Medical.png)
 ## If this work is helpful to you, please cite it as：
 ```
 @article{
