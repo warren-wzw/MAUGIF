@@ -1,5 +1,5 @@
 # MAUGIF
-This is official Pytorch implementation of "[MAUGIF: Mechanism-Aware Unsupervised General Image Fusion via Dual Cross-Image Autoencoders]()"
+This is official Pytorch implementation of "[MAUGIF: Mechanism-Aware Unsupervised General Image Fusion via Dual Cross-Image Autoencoders](https://arxiv.org/abs/2511.08272)"
  - 
 ```
 @article{
