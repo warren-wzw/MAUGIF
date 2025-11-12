@@ -51,7 +51,6 @@ MAUGIF/
 ## Experiments 
 ### Dataset & Checkpoints & Results
 The results can be in [MAUGIF](https://www.dropbox.com/scl/fo/cmzser4ibtza4afqqw9yh/ABNRa83qn3rh1P_5UwTpWno?rlkey=u3ytba9dmblnv1w0y8lnbgk3h&st=x526zldf&dl=0). 
-Download MSRS dataset from [xxx]() 
 If you need to evaluate other datasets, please organize them as follows:
 ```
 ├── /dataset
