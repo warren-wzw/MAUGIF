@@ -3,7 +3,14 @@ This is official Pytorch implementation of "[MAUGIF: Mechanism-Aware Unsupervise
  - 
 ```
 @article{
-
+    yang2025maugifmechanismawareunsupervisedgeneral,
+    title={MAUGIF: Mechanism-Aware Unsupervised General Image Fusion via Dual Cross-Image Autoencoders}, 
+    author={Kunjing Yang and Zhiwei Wang and Minru Bai},
+    year={2025},
+    eprint={2511.08272},
+    archivePrefix={arXiv},
+    primaryClass={cs.CV},
+    url={https://arxiv.org/abs/2511.08272}, 
 }
 ```
 ## Framework
@@ -110,6 +117,14 @@ python train_model.py
 ## If this work is helpful to you, please cite it as：
 ```
 @article{
+    yang2025maugifmechanismawareunsupervisedgeneral,
+    title={MAUGIF: Mechanism-Aware Unsupervised General Image Fusion via Dual Cross-Image Autoencoders}, 
+    author={Kunjing Yang and Zhiwei Wang and Minru Bai},
+    year={2025},
+    eprint={2511.08272},
+    archivePrefix={arXiv},
+    primaryClass={cs.CV},
+    url={https://arxiv.org/abs/2511.08272}, 
 }
 ```
 ## Acknowledgements
