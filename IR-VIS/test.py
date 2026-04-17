@@ -10,9 +10,9 @@ from model.model import *
 from model.utils import *
 import time
 
-WEIGHTS_ENCODER = './checkpoints/model_en.pt'
-WEIGHTS_DECODER = './checkpoints/model_de.pt'
-DATA=f'/home/BlueDisk/Dataset/FusionDataset/RGBT/MSRS/test/'
+WEIGHTS_ENCODER = './checkpoints/MSRS/model_en.pt'
+WEIGHTS_DECODER = './checkpoints/MSRS/model_de.pt'
+DATA=f'/home/BlueDisk/Dataset/FusionDataset/RGBT/MSRS/train/'
     
 def main():
     encoder_ir  = IR_Encoder()
@@ -31,7 +31,7 @@ def main():
         for file in files:
             vis=DATA+'vi/'+file
             ir=DATA+'ir/'+file
-            image1 = Image.open(vis)
+            image1 = Image.open(vis).convert("RGB")
             image2 = Image.open(ir).convert("L")
             vis  = convert_tensor(image1).to('cuda:0')
             ir = convert_tensor(image2).to('cuda:0').unsqueeze(0)

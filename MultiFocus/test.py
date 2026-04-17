@@ -10,7 +10,7 @@ from model.utils import *
 
 WEIGHTS_ENCODER = './checkpoints/model_en.pt'
 WEIGHTS_DECODER = './checkpoints/model_de.pt'
-DATA=f'/home/BlueDisk/Dataset/FusionDataset/Done/MultiFocus_MFI-WHU/test/'
+DATA=f'/home/BlueDisk/Dataset/FusionDataset/MultiFocus/WHU/test/'
     
 def main():
     encoder_ir  = IR_Encoder()
@@ -22,12 +22,12 @@ def main():
     """load checkpoints"""
     model_en.load_state_dict(torch.load(WEIGHTS_ENCODER))
     model_de.load_state_dict(torch.load(WEIGHTS_DECODER))
-    files=os.listdir(DATA+"/FAR/")
+    files=os.listdir(DATA+"/ir/")
     convert_tensor = transforms.ToTensor()
     with torch.no_grad():
         for file in files:
-            vis=DATA+'FAR/'+file
-            ir=DATA+'NEAR/'+file
+            vis=DATA+'ir/'+file
+            ir=DATA+'vi/'+file
             image1 = Image.open(vis)
             image2 = Image.open(ir).convert("L")
             vis  = convert_tensor(image1).to('cuda:0')

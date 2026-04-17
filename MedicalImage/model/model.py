@@ -90,7 +90,6 @@ class Decoder(nn.Module):
             nn.Conv2d(16, 3, kernel_size=1)       # 输出3通道
         )
 
-
         self.conv4 = nn.Sequential(
             nn.Conv2d(5, 32, kernel_size=3, padding=1),  # 增加中间通道
             nn.BatchNorm2d(32),
